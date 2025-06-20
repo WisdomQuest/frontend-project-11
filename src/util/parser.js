@@ -1,10 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export default function (data) {
+export default function Parser(data) {
   const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
-  console.log(xmlDoc);
-  const error = xmlDoc.querySelector('parseerorr');
+  const xmlDoc = parser.parseFromString(data.contents, 'application/xml');
+  const error = xmlDoc.querySelector('parsererror');
   if (error) {
     throw new Error('parser error.');
   }
@@ -21,7 +20,7 @@ export default function (data) {
     const idPost = uuidv4();
     const link = item.querySelector('link').textContent;
     posts.push({
-      title, description, link, id: idPost, feed: idFeed,
+      title, description, link, id: idPost, idFeed,
     });
   });
   return { feed, posts };

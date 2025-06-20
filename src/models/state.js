@@ -12,7 +12,7 @@ const state = {
     error: '',
   },
   stateUi: {
-    showedPost: [],
+    showedPost: new Set(),
     openModal: false,
   },
 };
