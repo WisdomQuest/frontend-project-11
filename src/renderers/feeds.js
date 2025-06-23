@@ -18,17 +18,17 @@ const renderFeeds = (feeds, containerSelector = '.feeds') => {
   const listGroup = document.createElement('ul');
   listGroup.className = 'list-group border-0 rounded-0';
 
-  feeds.forEach((feedItem) => {
+  feeds.forEach((feed) => {
     const listItem = document.createElement('li');
     listItem.className = 'list-group-item border-0 border-end-0';
 
     const itemTitle = document.createElement('h3');
     itemTitle.className = 'h6 m-0';
-    itemTitle.textContent = feedItem.feed.title;
+    itemTitle.textContent = feed.title;
 
     const itemText = document.createElement('p');
     itemText.className = 'm-0 small text-black-50';
-    itemText.textContent = feedItem.feed.description;
+    itemText.textContent = feed.description;
 
     listItem.appendChild(itemTitle);
     listItem.appendChild(itemText);

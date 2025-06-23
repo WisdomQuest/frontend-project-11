@@ -1,17 +1,19 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export default function Parser(data) {
+export default function Parser(data, url, feedId = uuidv4()) {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(data.contents, 'application/xml');
   const error = xmlDoc.querySelector('parsererror');
   if (error) {
     throw new Error('parser error.');
   }
-  const idFeed = uuidv4();
 
   const title = xmlDoc.querySelector('title').textContent;
   const description = xmlDoc.querySelector('description').textContent;
-  const feed = { title, description, id: idFeed };
+
+  // Используем переданный feedId или генерируем новый только для первого создания
+  const feed = { title, description, id: feedId, url };
+
   const items = xmlDoc.querySelectorAll('item');
   const posts = [];
   items.forEach((item) => {
@@ -20,7 +22,11 @@ export default function Parser(data) {
     const idPost = uuidv4();
     const link = item.querySelector('link').textContent;
     posts.push({
-      title, description, link, id: idPost, idFeed,
+      title,
+      description,
+      link,
+      id: idPost,
+      idFeed: feedId, // Используем тот же feedId, что и у фида
     });
   });
   return { feed, posts };
