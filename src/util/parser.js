@@ -11,7 +11,6 @@ export default function Parser(data, url, feedId = uuidv4()) {
   const title = xmlDoc.querySelector('title').textContent;
   const description = xmlDoc.querySelector('description').textContent;
 
-  // Используем переданный feedId или генерируем новый только для первого создания
   const feed = { title, description, id: feedId, url };
 
   const items = xmlDoc.querySelectorAll('item');
@@ -26,7 +25,7 @@ export default function Parser(data, url, feedId = uuidv4()) {
       description,
       link,
       id: idPost,
-      idFeed: feedId, // Используем тот же feedId, что и у фида
+      idFeed: feedId,
     });
   });
   return { feed, posts };

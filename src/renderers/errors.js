@@ -1,5 +1,5 @@
-const renderErrors = (error, containerSelector = '.feedback') => {
-  const errorContainer = document.querySelector(containerSelector);
+const renderErrors = (error) => {
+  const errorContainer = document.querySelector('.feedback');
   errorContainer.innerHTML = '';
 
   const errorElement = document.createElement('div');

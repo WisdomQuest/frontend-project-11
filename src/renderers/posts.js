@@ -1,6 +1,10 @@
-const renderPosts = (posts, containerSelector = '.posts') => {
-  const postsContainer = document.querySelector(containerSelector);
+import state from '../models/state.js';
+
+const renderPosts = (posts) => {
+  const postsContainer = document.querySelector('.posts');
   postsContainer.innerHTML = '';
+
+  const { viewedPosts } = state.uiState;
 
   const card = document.createElement('div');
   card.className = 'card border-0';
@@ -25,7 +29,9 @@ const renderPosts = (posts, containerSelector = '.posts') => {
 
     const postLink = document.createElement('a');
     postLink.href = post.link;
-    postLink.className = 'fw-bold';
+    postLink.className = viewedPosts.has(post.id)
+      ? 'fw-normal'
+      : 'fw-bold';
     postLink.textContent = post.title;
     postLink.setAttribute('target', '_blank');
     postLink.setAttribute('rel', 'noopener noreferrer');

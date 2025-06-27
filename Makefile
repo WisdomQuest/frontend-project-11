@@ -8,4 +8,4 @@ lint:
 	npx eslint .
 
 develop:
-	npm start
+	npm run dev

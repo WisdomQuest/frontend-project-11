@@ -8,6 +8,10 @@ export default {
   server: {
     port: 8080,
     hot: true,
+    watch: {
+      usePolling: true,
+    },
+    hmr: true,
   },
   // Optional: Silence Sass deprecation warnings. See note below.
   css: {

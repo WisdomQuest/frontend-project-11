@@ -8,12 +8,15 @@ const state = {
     isValid: false,
   },
   process: {
-    state: 'processing',
+    state: 'validating',
     error: '',
   },
-  stateUi: {
-    showedPost: new Set(),
-    openModal: false,
+  uiState: {
+    viewedPosts: new Set(),
+    modal: {
+      isOpen: false,
+      postId: null,
+    },
   },
 };
 

@@ -8,6 +8,7 @@ import initValidation from '../util/validation.js';
 import renderErrors from '../renderers/errors.js';
 import renderFeeds from '../renderers/feeds.js';
 import renderPosts from '../renderers/posts.js';
+import renderModal from '../renderers/modal.js';
 
 const i18nInstance = i18next.createInstance();
 i18nInstance.init({
@@ -33,12 +34,33 @@ const dataWatcher = onChange(state.data, (path) => {
   }
 });
 
+const uiStateWatcher = onChange(state.uiState, (path) => {
+  if (path === 'viewedPosts') {
+    renderPosts(state.data.posts);
+  }
+  if (path.startsWith('modal')) {
+    renderModal(state.uiState.modal, state.data.posts);
+  }
+});
+
+const processWatcher = onChange(state.process, () => {
+  const submitButton = document.querySelector('[type="submit"]');
+  if (!submitButton) return;
+
+  submitButton.disabled = state.process.status === 'processing';
+
+  const spinner = submitButton.querySelector('.spinner');
+  if (spinner) {
+    spinner.style.display =
+      state.process.status === 'processing' ? 'inline-block' : 'none';
+  }
+});
+
 const validateUrl = (url) => {
   const schema = validationSchema(state.data.feeds);
   return schema.validate({ url }, { abortEarly: false });
 };
 
-// 🔄 Функция для обновления фидов (проверка новых постов)
 const updateFeeds = () => {
   if (state.data.feeds.length === 0) {
     setTimeout(updateFeeds, 5000);
@@ -54,7 +76,6 @@ const updateFeeds = () => {
         throw new Error('Network response was not ok.');
       })
       .then((data) => {
-        // Используем существующий ID фида при обновлении
         const { posts: newPosts } = parser(data, feed.url, feed.id);
 
         const existingLinks = new Set(
@@ -81,6 +102,14 @@ export default () => {
   const form = document.querySelector('.rss-form');
   const inputForm = document.getElementById('url-input');
 
+  const handlePreviewClick = (postId) => {
+    uiStateWatcher.viewedPosts.add(postId);
+    uiStateWatcher.modal = {
+      isOpen: true,
+      postId,
+    };
+  };
+
   const handleBtn = (e) => {
     e.preventDefault();
     const { value } = inputForm;
@@ -91,6 +120,8 @@ export default () => {
       formWatcher.error = error;
 
       if (isValid) {
+        processWatcher.status = 'processing';
+        processWatcher.error = null;
         return fetch(
           `https://allorigins.hexlet.app/get?url=${encodeURIComponent(url)}`
         )
@@ -99,17 +130,17 @@ export default () => {
             throw new Error('Network response was not ok.');
           })
           .then((data) => {
-            // Генерируем ID фида один раз перед парсингом
             const feedId = uuidv4();
-            const { feed, posts } = parser(data, url, feedId); // Передаем feedId в парсер
+            const { feed, posts } = parser(data, url, feedId);
 
             dataWatcher.feeds = [feed, ...state.data.feeds];
             dataWatcher.posts = [...posts, ...state.data.posts];
+            processWatcher.status = 'success';
           })
           .catch((err) => {
-            console.error(err);
             formWatcher.error = [err];
             formWatcher.isValid = false;
+            processWatcher.status = i18nInstance.t('network_error');
           });
       }
     });
@@ -117,6 +148,20 @@ export default () => {
 
   form.addEventListener('submit', handleBtn);
 
-  // Запускаем периодическую проверку
+  document.addEventListener('click', (e) => {
+    const openBtn = e.target.closest('[data-bs-toggle="modal"]');
+    if (openBtn) {
+      const postId = openBtn.dataset.id;
+      handlePreviewClick(postId);
+    }
+
+    const closeBtn = e.target.closest('[data-bs-dismiss="modal"]');
+    if (closeBtn) {
+      e.preventDefault();
+      uiStateWatcher.modal.isOpen = false;
+      uiStateWatcher.modal.postId = null;
+    }
+  });
+
   setTimeout(updateFeeds, 5000);
 };
