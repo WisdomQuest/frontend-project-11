@@ -48,12 +48,6 @@ const processWatcher = onChange(state.process, () => {
   if (!submitButton) return;
 
   submitButton.disabled = state.process.status === 'processing';
-
-  const spinner = submitButton.querySelector('.spinner');
-  if (spinner) {
-    spinner.style.display =
-      state.process.status === 'processing' ? 'inline-block' : 'none';
-  }
 });
 
 const validateUrl = (url) => {
