@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export default function Parser(data, url, feedId = uuidv4()) {
+export default function Parser(data, url, i18nInstance, feedId = uuidv4()) {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(data.contents, 'application/xml');
   const error = xmlDoc.querySelector('parsererror');
   if (error) {
-    throw new Error('parser error.');
+    throw i18nInstance.t('error.no_rss');
   }
 
   const title = xmlDoc.querySelector('title').textContent;

@@ -9,6 +9,7 @@ import renderErrors from '../renderers/errors.js';
 import renderFeeds from '../renderers/feeds.js';
 import renderPosts from '../renderers/posts.js';
 import renderModal from '../renderers/modal.js';
+import renderViewedPost from '../renderers/post.js';
 
 const i18nInstance = i18next.createInstance();
 i18nInstance.init({
@@ -21,25 +22,38 @@ const validationSchema = initValidation(i18nInstance);
 
 const formWatcher = onChange(state.form, (path, value) => {
   if (path === 'error') {
-    renderErrors(value);
+    renderErrors(value, i18nInstance);
   }
 });
+
+const uiStateWatcher = onChange(state.uiState, (path) => {
+  if (path.startsWith('modal')) {
+    renderModal(state.uiState.modal, state.data.posts);
+  }
+});
+
+const handleClose = () => {
+  uiStateWatcher.modal.isOpen = false;
+  uiStateWatcher.modal.postId = null;
+};
+
+const handleOpenModal = (postId) => {
+  uiStateWatcher.viewedPosts.add(postId);
+  const posts = document.querySelectorAll('.list-group-item');
+  renderViewedPost(posts, postId);
+
+  uiStateWatcher.modal = {
+    isOpen: true,
+    postId,
+  };
+};
 
 const dataWatcher = onChange(state.data, (path) => {
   if (path === 'feeds') {
     renderFeeds(state.data.feeds);
   }
   if (path === 'posts') {
-    renderPosts(state.data.posts);
-  }
-});
-
-const uiStateWatcher = onChange(state.uiState, (path) => {
-  if (path === 'viewedPosts') {
-    renderPosts(state.data.posts);
-  }
-  if (path.startsWith('modal')) {
-    renderModal(state.uiState.modal, state.data.posts);
+    renderPosts(state.data.posts, handleOpenModal);
   }
 });
 
@@ -70,7 +84,12 @@ const updateFeeds = () => {
         throw new Error('Network response was not ok.');
       })
       .then((data) => {
-        const { posts: newPosts } = parser(data, feed.url, feed.id);
+        const { posts: newPosts } = parser(
+          data,
+          feed.url,
+          i18nInstance,
+          feed.id
+        );
 
         const existingLinks = new Set(
           state.data.posts
@@ -88,21 +107,12 @@ const updateFeeds = () => {
       })
       .catch((err) => console.error(`Ошибка обновления фида ${feed.url}:`, err))
   );
-
   Promise.all(promises).finally(() => setTimeout(updateFeeds, 5000));
 };
 
 export default () => {
   const form = document.querySelector('.rss-form');
   const inputForm = document.getElementById('url-input');
-
-  const handlePreviewClick = (postId) => {
-    uiStateWatcher.viewedPosts.add(postId);
-    uiStateWatcher.modal = {
-      isOpen: true,
-      postId,
-    };
-  };
 
   const handleBtn = (e) => {
     e.preventDefault();
@@ -125,37 +135,30 @@ export default () => {
           })
           .then((data) => {
             const feedId = uuidv4();
-            const { feed, posts } = parser(data, url, feedId);
+            const { feed, posts } = parser(data, url, i18nInstance, feedId);
 
             dataWatcher.feeds = [feed, ...state.data.feeds];
             dataWatcher.posts = [...posts, ...state.data.posts];
             processWatcher.status = 'success';
+            inputForm.value = '';
+            inputForm.focus();
           })
           .catch((err) => {
-            formWatcher.error = [err];
+            if (err === i18nInstance.t('error.no_rss')) {
+              formWatcher.error = i18nInstance.t('error.no_rss');
+            } else {
+              formWatcher.error = i18nInstance.t('error.network_error');
+            }
             formWatcher.isValid = false;
-            processWatcher.status = i18nInstance.t('network_error');
+            processWatcher.status = 'failed';
           });
       }
     });
   };
 
   form.addEventListener('submit', handleBtn);
-
-  document.addEventListener('click', (e) => {
-    const openBtn = e.target.closest('[data-bs-toggle="modal"]');
-    if (openBtn) {
-      const postId = openBtn.dataset.id;
-      handlePreviewClick(postId);
-    }
-
-    const closeBtn = e.target.closest('[data-bs-dismiss="modal"]');
-    if (closeBtn) {
-      e.preventDefault();
-      uiStateWatcher.modal.isOpen = false;
-      uiStateWatcher.modal.postId = null;
-    }
-  });
+  const closeButton = document.querySelector('.modal .btn-secondary');
+  closeButton.addEventListener('click', handleClose);
 
   setTimeout(updateFeeds, 5000);
 };

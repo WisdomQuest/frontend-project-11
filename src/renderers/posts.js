@@ -1,10 +1,8 @@
-import state from '../models/state.js';
+// import state from '../models/state.js';
 
-const renderPosts = (posts) => {
+const renderPosts = (posts, handleClick) => {
   const postsContainer = document.querySelector('.posts');
   postsContainer.innerHTML = '';
-
-  const { viewedPosts } = state.uiState;
 
   const card = document.createElement('div');
   card.className = 'card border-0';
@@ -29,13 +27,12 @@ const renderPosts = (posts) => {
 
     const postLink = document.createElement('a');
     postLink.href = post.link;
-    postLink.className = viewedPosts.has(post.id)
-      ? 'fw-normal'
-      : 'fw-bold';
+    postLink.className = 'fw-bold';
     postLink.textContent = post.title;
     postLink.setAttribute('target', '_blank');
     postLink.setAttribute('rel', 'noopener noreferrer');
     postLink.dataset.id = post.id;
+    postLink.addEventListener('click', () => handleClick(post.id));
 
     const viewButton = document.createElement('button');
     viewButton.type = 'button';
@@ -44,6 +41,7 @@ const renderPosts = (posts) => {
     viewButton.dataset.id = post.id;
     viewButton.dataset.bsToggle = 'modal';
     viewButton.dataset.bsTarget = '#modal';
+    viewButton.addEventListener('click', () => handleClick(post.id));
 
     listItem.appendChild(postLink);
     listItem.appendChild(viewButton);
