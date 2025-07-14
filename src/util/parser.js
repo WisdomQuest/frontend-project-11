@@ -5,21 +5,21 @@ export default function Parser(data, url, i18nInstance, feedId = uuidv4()) {
   const xmlDoc = parser.parseFromString(data.contents, 'application/xml');
   const error = xmlDoc.querySelector('parsererror');
   if (error) {
-    throw i18nInstance.t('error.no_rss');
+    throw new Error(i18nInstance.t('error.no_rss')); // Бросаем Error с сообщением
   }
 
-  const title = xmlDoc.querySelector('title').textContent;
-  const description = xmlDoc.querySelector('description').textContent;
+  const title = xmlDoc.querySelector('title')?.textContent || '';
+  const description = xmlDoc.querySelector('description')?.textContent || '';
 
   const feed = { title, description, id: feedId, url };
 
   const items = xmlDoc.querySelectorAll('item');
   const posts = [];
   items.forEach((item) => {
-    const title = item.querySelector('title').textContent;
-    const description = item.querySelector('description').textContent;
+    const title = item.querySelector('title')?.textContent || '';
+    const description = item.querySelector('description')?.textContent || '';
     const idPost = uuidv4();
-    const link = item.querySelector('link').textContent;
+    const link = item.querySelector('link')?.textContent || '';
     posts.push({
       title,
       description,

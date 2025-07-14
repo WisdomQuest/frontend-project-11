@@ -37,13 +37,13 @@ const handleClose = () => {
   uiStateWatcher.modal.postId = null;
 };
 
-const handleOpenModal = (postId) => {
+const handleOpenModal = (postId, showModal = true) => {
   uiStateWatcher.viewedPosts.add(postId);
   const posts = document.querySelectorAll('.list-group-item');
   renderViewedPost(posts, postId);
 
   uiStateWatcher.modal = {
-    isOpen: true,
+    isOpen: showModal,
     postId,
   };
 };
@@ -53,15 +53,19 @@ const dataWatcher = onChange(state.data, (path) => {
     renderFeeds(state.data.feeds);
   }
   if (path === 'posts') {
-    renderPosts(state.data.posts, handleOpenModal);
+    renderPosts(state.data.posts, state.uiState.viewedPosts, handleOpenModal);
   }
 });
 
-const processWatcher = onChange(state.process, () => {
+const processWatcher = onChange(state.process, (path, value) => {
   const submitButton = document.querySelector('[type="submit"]');
   if (!submitButton) return;
 
   submitButton.disabled = state.process.status === 'processing';
+
+  if (path === 'error') {
+    renderErrors(value, i18nInstance);
+  }
 });
 
 const validateUrl = (url) => {
@@ -131,12 +135,11 @@ export default () => {
         )
           .then((response) => {
             if (response.ok) return response.json();
-            throw new Error('Network response was not ok.');
+            // throw new Error('Network response was not ok.');
           })
           .then((data) => {
             const feedId = uuidv4();
             const { feed, posts } = parser(data, url, i18nInstance, feedId);
-
             dataWatcher.feeds = [feed, ...state.data.feeds];
             dataWatcher.posts = [...posts, ...state.data.posts];
             processWatcher.status = 'success';
@@ -144,10 +147,10 @@ export default () => {
             inputForm.focus();
           })
           .catch((err) => {
-            if (err === i18nInstance.t('error.no_rss')) {
-              formWatcher.error = i18nInstance.t('error.no_rss');
+            if (err.message === i18nInstance.t('error.no_rss')) {
+              processWatcher.error = i18nInstance.t('error.no_rss');
             } else {
-              formWatcher.error = i18nInstance.t('error.network_error');
+              processWatcher.error = i18nInstance.t('error.network_error');
             }
             formWatcher.isValid = false;
             processWatcher.status = 'failed';
@@ -157,8 +160,10 @@ export default () => {
   };
 
   form.addEventListener('submit', handleBtn);
-  const closeButton = document.querySelector('.modal .btn-secondary');
-  closeButton.addEventListener('click', handleClose);
+  const closeButtons = document.querySelectorAll('[data-bs-dismiss="modal"]');
+  closeButtons.forEach((button) => {
+    button.addEventListener('click', handleClose);
+  });
 
   setTimeout(updateFeeds, 5000);
 };

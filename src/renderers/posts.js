@@ -1,6 +1,6 @@
 // import state from '../models/state.js';
 
-const renderPosts = (posts, handleClick) => {
+const renderPosts = (posts, viewedPosts, handleClick) => {
   const postsContainer = document.querySelector('.posts');
   postsContainer.innerHTML = '';
 
@@ -27,12 +27,12 @@ const renderPosts = (posts, handleClick) => {
 
     const postLink = document.createElement('a');
     postLink.href = post.link;
-    postLink.className = 'fw-bold';
+    postLink.className = viewedPosts.has(post.id) ? 'fw-normal link-secondary' : 'fw-bold';
     postLink.textContent = post.title;
     postLink.setAttribute('target', '_blank');
     postLink.setAttribute('rel', 'noopener noreferrer');
     postLink.dataset.id = post.id;
-    postLink.addEventListener('click', () => handleClick(post.id));
+    postLink.addEventListener('click', () => handleClick(post.id, false));
 
     const viewButton = document.createElement('button');
     viewButton.type = 'button';
@@ -41,7 +41,7 @@ const renderPosts = (posts, handleClick) => {
     viewButton.dataset.id = post.id;
     viewButton.dataset.bsToggle = 'modal';
     viewButton.dataset.bsTarget = '#modal';
-    viewButton.addEventListener('click', () => handleClick(post.id));
+    viewButton.addEventListener('click', () => handleClick(post.id, true));
 
     listItem.appendChild(postLink);
     listItem.appendChild(viewButton);

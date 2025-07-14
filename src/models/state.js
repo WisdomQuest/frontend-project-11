@@ -8,7 +8,7 @@ const state = {
     isValid: false,
   },
   process: {
-    state: 'validating',
+    state: 'filling',
     error: '',
   },
   uiState: {
