@@ -22,7 +22,7 @@ const validationSchema = initValidation(i18nInstance);
 
 const formWatcher = onChange(state.form, (path, value) => {
   if (path === 'error') {
-    renderErrors(value, i18nInstance);
+    renderErrors(value, i18nInstance, state.process.status);
   }
 });
 
@@ -48,7 +48,8 @@ const handleOpenModal = (postId, showModal = true) => {
   };
 };
 
-const dataWatcher = onChange(state.data, (path) => {
+const dataWatcher = onChange(state.data, (path, value) => {
+  console.log('Data changed:', path, value);
   if (path === 'feeds') {
     renderFeeds(state.data.feeds);
   }
@@ -58,13 +59,12 @@ const dataWatcher = onChange(state.data, (path) => {
 });
 
 const processWatcher = onChange(state.process, (path, value) => {
-  const submitButton = document.querySelector('[type="submit"]');
-  if (!submitButton) return;
-
-  submitButton.disabled = state.process.status === 'processing';
-
+  const submitButton = document.querySelector('.rss-form .btn-primary');
+  if (path === 'status') {
+    submitButton.disabled = state.process.status === 'processing';
+  }
   if (path === 'error') {
-    renderErrors(value, i18nInstance);
+    renderErrors(value, i18nInstance, state.process.status);
   }
 });
 
@@ -122,41 +122,46 @@ export default () => {
     e.preventDefault();
     const { value } = inputForm;
     const url = value.trim();
+    processWatcher.status = 'filling';
+    processWatcher.error = '';
+    formWatcher.error = '';
 
-    validateUrl(url).then(({ isValid, error }) => {
-      formWatcher.isValid = isValid;
-      formWatcher.error = error;
+    validateUrl(url)
+      .then(({ isValid, error }) => {
+        formWatcher.isValid = isValid;
+        formWatcher.error = error;
+        if (isValid) {
+          processWatcher.status = 'processing';
+          return fetch(
+            `https://allorigins.hexlet.app/get?url=${encodeURIComponent(url)}`
+          )
+            .then((response) => {
+              if (response.ok) {
+                return response.json();
+              }
+              throw new Error('Network response was not ok.');
+            })
+            .then((data) => {
+              const feedId = uuidv4();
+              const { feed, posts } = parser(data, url, i18nInstance, feedId);
+              processWatcher.status = 'success';
+              dataWatcher.feeds = [feed, ...state.data.feeds];
+              dataWatcher.posts = [...posts, ...state.data.posts];
+              processWatcher.error = null;
 
-      if (isValid) {
-        processWatcher.status = 'processing';
-        processWatcher.error = null;
-        return fetch(
-          `https://allorigins.hexlet.app/get?url=${encodeURIComponent(url)}`
-        )
-          .then((response) => {
-            if (response.ok) return response.json();
-            // throw new Error('Network response was not ok.');
-          })
-          .then((data) => {
-            const feedId = uuidv4();
-            const { feed, posts } = parser(data, url, i18nInstance, feedId);
-            dataWatcher.feeds = [feed, ...state.data.feeds];
-            dataWatcher.posts = [...posts, ...state.data.posts];
-            processWatcher.status = 'success';
-            inputForm.value = '';
-            inputForm.focus();
-          })
-          .catch((err) => {
-            if (err.message === i18nInstance.t('error.no_rss')) {
-              processWatcher.error = i18nInstance.t('error.no_rss');
-            } else {
-              processWatcher.error = i18nInstance.t('error.network_error');
-            }
-            formWatcher.isValid = false;
-            processWatcher.status = 'failed';
-          });
-      }
-    });
+              inputForm.value = '';
+              inputForm.focus();
+            })
+            .catch((err) => {
+              processWatcher.status = 'failed';
+              if (err.message === i18nInstance.t('error.no_rss')) {
+                processWatcher.error = i18nInstance.t('error.no_rss');
+              } else {
+                processWatcher.error = i18nInstance.t('error.network_error');
+              }
+            });
+        }
+      });
   };
 
   form.addEventListener('submit', handleBtn);
