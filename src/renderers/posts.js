@@ -22,8 +22,7 @@ const renderPosts = (posts, viewedPosts, handleClick) => {
 
   posts.forEach((post) => {
     const listItem = document.createElement('li');
-    listItem.className =
-      'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';
+    listItem.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';
 
     const postLink = document.createElement('a');
     postLink.href = post.link;

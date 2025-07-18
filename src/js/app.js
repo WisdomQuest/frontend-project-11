@@ -79,38 +79,36 @@ const updateFeeds = () => {
     return;
   }
 
-  const promises = state.data.feeds.map((feed) =>
-    fetch(
-      `https://allorigins.hexlet.app/get?url=${encodeURIComponent(feed.url)}`
-    )
-      .then((response) => {
-        if (response.ok) return response.json();
-        throw new Error('Network response was not ok.');
-      })
-      .then((data) => {
-        const { posts: newPosts } = parser(
-          data,
-          feed.url,
-          i18nInstance,
-          feed.id
-        );
+  const promises = state.data.feeds.map((feed) => fetch(
+    `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(feed.url)}`,
+  )
+    .then((response) => {
+      if (response.ok) return response.json();
+      throw new Error('Network response was not ok.');
+    })
+    .then((data) => {
+      const { posts: newPosts } = parser(
+        data,
+        feed.url,
+        i18nInstance,
+        feed.id,
+      );
 
-        const existingLinks = new Set(
-          state.data.posts
-            .filter((post) => post.idFeed === feed.id)
-            .map((post) => post.link)
-        );
+      const existingLinks = new Set(
+        state.data.posts
+          .filter((post) => post.idFeed === feed.id)
+          .map((post) => post.link),
+      );
 
-        const uniqueNewPosts = newPosts.filter(
-          (post) => !existingLinks.has(post.link)
-        );
+      const uniqueNewPosts = newPosts.filter(
+        (post) => !existingLinks.has(post.link),
+      );
 
-        if (uniqueNewPosts.length > 0) {
-          dataWatcher.posts = [...uniqueNewPosts, ...state.data.posts];
-        }
-      })
-      .catch((err) => console.error(`Ошибка обновления фида ${feed.url}:`, err))
-  );
+      if (uniqueNewPosts.length > 0) {
+        dataWatcher.posts = [...uniqueNewPosts, ...state.data.posts];
+      }
+    })
+    .catch((err) => console.error(`Ошибка обновления фида ${feed.url}:`, err)));
   Promise.all(promises).finally(() => setTimeout(updateFeeds, 5000));
 };
 
@@ -133,7 +131,7 @@ export default () => {
         if (isValid) {
           processWatcher.status = 'processing';
           return fetch(
-            `https://allorigins.hexlet.app/get?url=${encodeURIComponent(url)}`
+            `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`,
           )
             .then((response) => {
               if (response.ok) {

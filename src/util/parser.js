@@ -11,7 +11,9 @@ export default function Parser(data, url, i18nInstance, feedId = uuidv4()) {
   const title = xmlDoc.querySelector('title')?.textContent || '';
   const description = xmlDoc.querySelector('description')?.textContent || '';
 
-  const feed = { title, description, id: feedId, url };
+  const feed = {
+    title, description, id: feedId, url,
+  };
 
   const items = xmlDoc.querySelectorAll('item');
   const posts = [];
