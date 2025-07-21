@@ -1,5 +1,3 @@
-// import state from '../models/state.js';
-
 const renderPosts = (posts, viewedPosts, handleClick) => {
   const postsContainer = document.querySelector('.posts')
   postsContainer.innerHTML = ''

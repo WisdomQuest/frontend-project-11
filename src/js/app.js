@@ -80,7 +80,9 @@ const updateFeeds = () => {
   }
 
   const promises = state.data.feeds.map((feed) => fetch(
-    `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(feed.url)}`,
+    `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(
+      feed.url,
+    )}`,
   )
     .then((response) => {
       if (response.ok) return response.json()
@@ -124,42 +126,41 @@ export default () => {
     processWatcher.error = ''
     formWatcher.error = ''
 
-    validateUrl(url)
-      .then(({ isValid, error }) => {
-        formWatcher.isValid = isValid
-        formWatcher.error = error
-        if (isValid) {
-          processWatcher.status = 'processing'
-          return fetch(
-            `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`,
-          )
-            .then((response) => {
-              if (response.ok) {
-                return response.json()
-              }
-              throw new Error('Network response was not ok.')
-            })
-            .then((data) => {
-              const feedId = uuidv4()
-              const { feed, posts } = parser(data, url, i18nInstance, feedId)
-              processWatcher.status = 'success'
-              dataWatcher.feeds = [feed, ...state.data.feeds]
-              dataWatcher.posts = [...posts, ...state.data.posts]
-              processWatcher.error = null
+    validateUrl(url).then(({ isValid, error }) => {
+      formWatcher.isValid = isValid
+      formWatcher.error = error
 
-              inputForm.value = ''
-              inputForm.focus()
-            })
-            .catch((err) => {
-              processWatcher.status = 'failed'
-              if (err.message === i18nInstance.t('error.no_rss')) {
-                processWatcher.error = i18nInstance.t('error.no_rss')
-              } else {
-                processWatcher.error = i18nInstance.t('error.network_error')
-              }
-            })
-        }
-      })
+      if (!isValid) {
+        return Promise.resolve() // Возвращаем пустой Promise
+      }
+
+      processWatcher.status = 'processing'
+      return fetch(
+        `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(
+          url,
+        )}`,
+      )
+        .then((response) => {
+          if (response.ok) return response.json()
+          throw new Error('Network response was not ok.')
+        })
+        .then((data) => {
+          const feedId = uuidv4()
+          const { feed, posts } = parser(data, url, i18nInstance, feedId)
+          processWatcher.status = 'success'
+          dataWatcher.feeds = [feed, ...state.data.feeds]
+          dataWatcher.posts = [...posts, ...state.data.posts]
+          processWatcher.error = null
+          inputForm.value = ''
+          inputForm.focus()
+        })
+        .catch((err) => {
+          processWatcher.status = 'failed'
+          processWatcher.error = err.message === i18nInstance.t('error.no_rss')
+            ? i18nInstance.t('error.no_rss')
+            : i18nInstance.t('error.network_error')
+        })
+    })
   }
 
   form.addEventListener('submit', handleBtn)
