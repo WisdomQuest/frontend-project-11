@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 
 const checkDuplicateUrl = (url, feeds) => new Promise((resolve) => {
-  const isDuplicate = feeds.some((feed) => feed.url === url)
+  const isDuplicate = feeds.some(feed => feed.url === url)
   resolve(isDuplicate)
 })
 
@@ -15,7 +15,7 @@ export default (i18nInstance) => {
     },
   })
 
-  return (feeds) => ({
+  return feeds => ({
     validate: (input) => {
       const { url } = input
       const schema = yup
@@ -28,7 +28,7 @@ export default (i18nInstance) => {
           (value) => {
             if (!value) return true
             return checkDuplicateUrl(value, feeds).then(
-              (isDuplicate) => !isDuplicate,
+              isDuplicate => !isDuplicate,
             )
           },
         )
@@ -36,7 +36,7 @@ export default (i18nInstance) => {
       return schema
         .validate(url, { abortEarly: false })
         .then(() => ({ isValid: true, error: null }))
-        .catch((err) => ({ isValid: false, error: err.errors }))
+        .catch(err => ({ isValid: false, error: err.errors }))
     },
   })
 }

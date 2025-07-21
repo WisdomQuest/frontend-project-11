@@ -79,7 +79,7 @@ const updateFeeds = () => {
     return
   }
 
-  const promises = state.data.feeds.map((feed) => fetch(
+  const promises = state.data.feeds.map(feed => fetch(
     `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(
       feed.url,
     )}`,
@@ -98,19 +98,19 @@ const updateFeeds = () => {
 
       const existingLinks = new Set(
         state.data.posts
-          .filter((post) => post.idFeed === feed.id)
-          .map((post) => post.link),
+          .filter(post => post.idFeed === feed.id)
+          .map(post => post.link),
       )
 
       const uniqueNewPosts = newPosts.filter(
-        (post) => !existingLinks.has(post.link),
+        post => !existingLinks.has(post.link),
       )
 
       if (uniqueNewPosts.length > 0) {
         dataWatcher.posts = [...uniqueNewPosts, ...state.data.posts]
       }
     })
-    .catch((err) => console.error(`Ошибка обновления фида ${feed.url}:`, err)))
+    .catch(err => console.error(`Ошибка обновления фида ${feed.url}:`, err)))
   Promise.all(promises).finally(() => setTimeout(updateFeeds, 5000))
 }
 

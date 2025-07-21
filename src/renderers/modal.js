@@ -2,7 +2,7 @@ const renderModal = (modalState, posts) => {
   const modalElement = document.getElementById('modal')
   if (!modalElement) return
 
-  const post = posts.find((p) => p.id === modalState.postId)
+  const post = posts.find(p => p.id === modalState.postId)
   if (!post) return
 
   modalElement.querySelector('.modal-title').textContent = post.title
@@ -13,7 +13,8 @@ const renderModal = (modalState, posts) => {
     modalElement.classList.add('show')
     modalElement.style.display = 'block'
     modalElement.setAttribute('aria-modal', 'true')
-  } else {
+  } 
+  else {
     modalElement.classList.remove('show')
     modalElement.style.display = 'none'
     modalElement.setAttribute('aria-hidden', 'true')
