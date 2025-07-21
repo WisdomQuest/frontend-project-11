@@ -18,6 +18,6 @@ const state = {
       postId: null,
     },
   },
-};
+}
 
-export default state;
+export default state
