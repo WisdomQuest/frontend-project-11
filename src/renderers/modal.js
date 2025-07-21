@@ -13,7 +13,7 @@ const renderModal = (modalState, posts) => {
     modalElement.classList.add('show')
     modalElement.style.display = 'block'
     modalElement.setAttribute('aria-modal', 'true')
-  } 
+  }
   else {
     modalElement.classList.remove('show')
     modalElement.style.display = 'none'
