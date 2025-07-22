@@ -1,5 +1,3 @@
-/* eslint-env browser */
-
 import onChange from 'on-change'
 import i18next from 'i18next'
 import { v4 as uuidv4 } from 'uuid'
@@ -132,7 +130,7 @@ export default () => {
       formWatcher.error = error
 
       if (!isValid) {
-        return Promise.resolve() // Возвращаем пустой Promise
+        return Promise.resolve()
       }
 
       processWatcher.status = 'processing'
