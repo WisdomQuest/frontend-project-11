@@ -5,7 +5,7 @@ export default function Parser(data, url, i18nInstance, feedId = uuidv4()) {
   const xmlDoc = parser.parseFromString(data.contents, 'application/xml')
   const error = xmlDoc.querySelector('parsererror')
   if (error) {
-    throw new Error(i18nInstance.t('error.no_rss')) // Бросаем Error с сообщением
+    throw new Error(i18nInstance.t('error.no_rss'))
   }
 
   const title = xmlDoc.querySelector('title')?.textContent || ''

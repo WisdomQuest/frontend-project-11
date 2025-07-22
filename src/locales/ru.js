@@ -9,7 +9,6 @@ export default {
         no_rss: 'Ресурс не содержит валидный RSS',
       },
       process: {
-        // viewing: 'Просмотр',
         success: 'RSS успешно загружен',
       },
     },
