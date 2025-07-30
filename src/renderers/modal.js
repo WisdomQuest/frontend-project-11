@@ -1,28 +1,28 @@
 const renderModal = (modalElement, modalState, posts) => {
-  if (!modalElement) return;
+  if (!modalElement) return
 
-  const modalTitle = modalElement.querySelector('.modal-title');
-  const modalBody = modalElement.querySelector('.modal-body');
-  const fullArticleLink = modalElement.querySelector('.full-article');
+  const modalTitle = modalElement.querySelector('.modal-title')
+  const modalBody = modalElement.querySelector('.modal-body')
+  const fullArticleLink = modalElement.querySelector('.full-article')
 
-  const post = posts.find(p => p.id === modalState.postId);
-  if (!post) return;
+  const post = posts.find((p) => p.id === modalState.postId)
+  if (!post) return
 
-  modalTitle.textContent = post.title;
-  modalBody.textContent = post.description;
-  fullArticleLink.href = post.link;
+  modalTitle.textContent = post.title
+  modalBody.textContent = post.description
+  fullArticleLink.href = post.link
 
   if (modalState.isOpen) {
-    modalElement.classList.add('show');
-    modalElement.style.display = 'block';
-    modalElement.setAttribute('aria-modal', 'true');
+    modalElement.classList.add('show')
+    modalElement.style.display = 'block'
+    modalElement.setAttribute('aria-modal', 'true')
   } else {
-    modalElement.classList.remove('show');
-    modalElement.style.display = 'none';
-    modalElement.setAttribute('aria-hidden', 'true');
-    modalTitle.textContent = '';
-    modalBody.textContent = '';
+    modalElement.classList.remove('show')
+    modalElement.style.display = 'none'
+    modalElement.setAttribute('aria-hidden', 'true')
+    modalTitle.textContent = ''
+    modalBody.textContent = ''
   }
-};
+}
 
-export default renderModal;
+export default renderModal
