@@ -9,7 +9,6 @@ const initWatchedState = (state, i18nInstance, handlers) => {
   const { handlePostClick } = handlers
 
   const watchedState = onChange(state, (path, value) => {
-    // Инициализация DOM элементов
     const errorContainer = document.querySelector('.feedback')
     const inputForm = document.getElementById('url-input')
     const submitButton = document.querySelector('.rss-form .btn-primary')
