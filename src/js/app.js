@@ -28,27 +28,22 @@ const initDOM = () => {
 const { form, inputForm, closeButtons } = initDOM()
 const validationSchema = initValidation(i18nInstance)
 
+const watchedState = initWatchedState(state, i18nInstance, {
+  handlePostClick: (postId, isModalClick = false) => {
+    watchedState.uiState.viewedPosts.add(postId)
+    if (isModalClick) {
+      watchedState.uiState.modal = {
+        isOpen: true,
+        postId,
+      }
+    }
+  },
+})
+
 const handleClose = () => {
   watchedState.uiState.modal.isOpen = false
   watchedState.uiState.modal.postId = null
 }
-
-const handleOpenModal = (postId, showModal = true) => {
-  watchedState.uiState.modal = {
-    isOpen: showModal,
-    postId,
-  }
-}
-
-const handlePostClick = (postId, isModalClick = false) => {
-  watchedState.uiState.viewedPosts.add(postId)
-  if (isModalClick) {
-    handleOpenModal(postId, true)
-  }
-}
-
-// Инициализация watchedState с обработчиками
-const watchedState = initWatchedState(state, i18nInstance, { handlePostClick })
 
 const validateUrl = async (url) => {
   const schema = validationSchema(watchedState.data.feeds)

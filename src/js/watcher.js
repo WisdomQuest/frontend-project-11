@@ -30,7 +30,6 @@ const initWatchedState = (state, i18nInstance, handlers) => {
       submitButton.disabled = state.process.status === 'processing'
     }
 
-    // Обработка данных фидов
     if (path === 'data.feeds') {
       renderFeeds(state.data.feeds)
     }
