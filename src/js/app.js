@@ -6,8 +6,56 @@ import parser from '../util/parser.js'
 import initValidation from '../util/validation.js'
 import initWatchedState from './watcher.js'
 
-export default () => {
+const fetchFeed = async (url) => {
+  const response = await fetch(
+    `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`,
+  )
+  if (!response.ok) throw new Error('Network response was not ok.')
+  return response.json()
+}
 
+const createUpdateFeeds = (watchedState, i18nInstance) => async () => {
+  if (watchedState.data.feeds.length === 0) {
+    setTimeout(createUpdateFeeds(watchedState, i18nInstance), 5000)
+    return
+  }
+
+  try {
+    const promises = watchedState.data.feeds.map(async (feed) => {
+      try {
+        const data = await fetchFeed(feed.url)
+        const { posts: newPosts } = parser(data, feed.url, i18nInstance, feed.feedId)
+
+        const existingLinks = new Set(
+          watchedState.data.posts
+            .filter((post) => post.feedId === feed.feedId)
+            .map((post) => post.link),
+        )
+
+        const uniqueNewPosts = newPosts.filter(
+          (post) => !existingLinks.has(post.link),
+        )
+
+        if (uniqueNewPosts.length > 0) {
+          watchedState.data.posts = [...uniqueNewPosts, ...watchedState.data.posts]
+        }
+      } catch (err) {
+        console.error(`Ошибка обновления фида ${feed.url}:`, err)
+      }
+    })
+
+    await Promise.all(promises)
+  } finally {
+    setTimeout(createUpdateFeeds(watchedState, i18nInstance), 5000)
+  }
+}
+
+const createValidateUrl = (validationSchema, watchedState) => async (url) => {
+  const schema = validationSchema(watchedState.data.feeds)
+  return schema.validate({ url }, { abortEarly: false })
+}
+
+export default () => {
   const i18nInstance = i18next.createInstance()
   i18nInstance.init({
     lng: 'ru',
@@ -15,38 +63,18 @@ export default () => {
     resources,
   })
 
-  const initDOM = () => {
-    const form = document.querySelector('.rss-form')
-    const inputForm = document.getElementById('url-input')
-    const closeButtons = document.querySelectorAll('[data-bs-dismiss="modal"]')
-    const errorContainer = document.querySelector('.feedback')
-    const submitButton = document.querySelector('.rss-form .btn-primary')
-    const postsContainer = document.querySelector('.posts')
-    const modalElement = document.getElementById('modal')
-    const feedsContainer = document.querySelector('.feeds')
+  const initDOM = () => ({
+    form: document.querySelector('.rss-form'),
+    inputForm: document.getElementById('url-input'),
+    closeButtons: document.querySelectorAll('[data-bs-dismiss="modal"]'),
+    errorContainer: document.querySelector('.feedback'),
+    submitButton: document.querySelector('.rss-form .btn-primary'),
+    postsContainer: document.querySelector('.posts'),
+    modalElement: document.getElementById('modal'),
+    feedsContainer: document.querySelector('.feeds'),
+  })
 
-    return {
-      form,
-      inputForm,
-      closeButtons,
-      errorContainer,
-      submitButton,
-      postsContainer,
-      modalElement,
-      feedsContainer,
-    }
-  }
-
-  const { 
-    form, 
-    inputForm, 
-    closeButtons, 
-    errorContainer, 
-    submitButton, 
-    postsContainer, 
-    modalElement, 
-    feedsContainer 
-  } = initDOM()
+  const { form, inputForm, closeButtons, errorContainer, submitButton, postsContainer, modalElement, feedsContainer } = initDOM()
 
   const validationSchema = initValidation(i18nInstance)
 
@@ -71,59 +99,11 @@ export default () => {
     },
   }, elements)
 
-  // Обработчики событий
+  const validateUrl = createValidateUrl(validationSchema, watchedState)
+  const updateFeeds = createUpdateFeeds(watchedState, i18nInstance)
   const handleClose = () => {
     watchedState.uiState.modal.isOpen = false
     watchedState.uiState.modal.postId = null
-  }
-
-  const validateUrl = async (url) => {
-    const schema = validationSchema(watchedState.data.feeds)
-    return schema.validate({ url }, { abortEarly: false })
-  }
-
-  const fetchFeed = async (url) => {
-    const response = await fetch(
-      `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`,
-    )
-    if (!response.ok) throw new Error('Network response was not ok.')
-    return response.json()
-  }
-
-  const updateFeeds = async () => {
-    if (watchedState.data.feeds.length === 0) {
-      setTimeout(updateFeeds, 5000)
-      return
-    }
-
-    try {
-      const promises = watchedState.data.feeds.map(async (feed) => {
-        try {
-          const data = await fetchFeed(feed.url)
-          const { posts: newPosts } = parser(data, feed.url, i18nInstance, feed.feedId)
-
-          const existingLinks = new Set(
-            watchedState.data.posts
-              .filter((post) => post.feedId === feed.feedId)
-              .map((post) => post.link),
-          )
-
-          const uniqueNewPosts = newPosts.filter(
-            (post) => !existingLinks.has(post.link),
-          )
-
-          if (uniqueNewPosts.length > 0) {
-            watchedState.data.posts = [...uniqueNewPosts, ...watchedState.data.posts]
-          }
-        } catch (err) {
-          console.error(`Ошибка обновления фида ${feed.url}:`, err)
-        }
-      })
-
-      await Promise.all(promises)
-    } finally {
-      setTimeout(updateFeeds, 5000)
-    }
   }
 
   const handleSubmit = async (e) => {
@@ -161,7 +141,6 @@ export default () => {
     }
   }
 
-  // Установка обработчиков событий
   form.addEventListener('submit', handleSubmit)
   closeButtons.forEach((button) => {
     button.addEventListener('click', handleClose)
