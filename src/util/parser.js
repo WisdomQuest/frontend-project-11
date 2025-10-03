@@ -1,37 +1,32 @@
 import { v4 as uuidv4 } from 'uuid';
 
+const getTextContent = (element, selector) =>
+  element.querySelector(selector)?.textContent?.trim() || '';
+
 export default function Parser(data, url, i18nInstance, feedId = uuidv4()) {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(data.contents, 'application/xml');
-  const error = xmlDoc.querySelector('parsererror');
-  if (error) {
+
+  if (xmlDoc.querySelector('parsererror')) {
     throw new Error(i18nInstance.t('error.no_rss'));
   }
 
-  const title = xmlDoc.querySelector('title')?.textContent || '';
-  const description = xmlDoc.querySelector('description')?.textContent || '';
-
   const feed = {
-    title,
-    description,
+    title: getTextContent(xmlDoc, 'title'),
+    description: getTextContent(xmlDoc, 'description'),
     feedId,
     url,
   };
 
   const items = xmlDoc.querySelectorAll('item');
-  const posts = [];
-  items.forEach((item) => {
-    const title = item.querySelector('title')?.textContent || '';
-    const description = item.querySelector('description')?.textContent || '';
-    const postId = uuidv4();
-    const link = item.querySelector('link')?.textContent || '';
-    posts.push({
-      title,
-      description,
-      link,
-      postId,
-      feedId,
-    });
-  });
+
+  const posts = Array.from(items).map((item) => ({
+    title: getTextContent(item, 'title'),
+    description: getTextContent(item, 'description'),
+    link: getTextContent(item, 'link'),
+    postId: uuidv4(),
+    feedId,
+  }));
+
   return { feed, posts };
 }
