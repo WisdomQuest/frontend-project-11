@@ -5,16 +5,18 @@ import renderPosts from '../renderers/posts.js'
 import renderModal from '../renderers/modal.js'
 import renderViewedPost from '../renderers/post.js'
 
-const initWatchedState = (state, i18nInstance, handlers) => {
+const initWatchedState = (state, i18nInstance, handlers, elements) => {
   const { handlePostClick } = handlers
+  const {
+    errorContainer,
+    inputForm,
+    submitButton,
+    postsContainer,
+    modalElement,
+    feedsContainer,
+  } = elements
 
   const watchedState = onChange(state, (path, value) => {
-    const errorContainer = document.querySelector('.feedback')
-    const inputForm = document.getElementById('url-input')
-    const submitButton = document.querySelector('.rss-form .btn-primary')
-    const postsContainer = document.querySelector('.posts')
-    const modalElement = document.getElementById('modal')
-
     if (path === 'form.error' || path === 'process.error' || path === 'process.status') {
       const error = state.form.error || state.process.error
       renderErrors(
@@ -31,7 +33,7 @@ const initWatchedState = (state, i18nInstance, handlers) => {
     }
 
     if (path === 'data.feeds') {
-      renderFeeds(state.data.feeds)
+      renderFeeds(state.data.feeds, i18nInstance, feedsContainer)
     }
 
     if (path === 'data.posts') {
@@ -44,7 +46,8 @@ const initWatchedState = (state, i18nInstance, handlers) => {
     }
 
     if (path.startsWith('uiState.modal')) {
-      renderModal(modalElement, state.uiState.modal, state.data.posts)
+      const post = state.data.posts.find((p) => p.postId === state.uiState.modal.postId)
+      renderModal(modalElement, state.uiState.modal, post)
     }
 
     if (path.startsWith('uiState.viewedPosts')) {

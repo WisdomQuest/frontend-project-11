@@ -17,16 +17,47 @@ const initDOM = () => {
   const form = document.querySelector('.rss-form')
   const inputForm = document.getElementById('url-input')
   const closeButtons = document.querySelectorAll('[data-bs-dismiss="modal"]')
+  
+  // Добавляем поиск всех необходимых элементов
+  const errorContainer = document.querySelector('.feedback')
+  const submitButton = document.querySelector('.rss-form .btn-primary')
+  const postsContainer = document.querySelector('.posts')
+  const modalElement = document.getElementById('modal')
+  const feedsContainer = document.querySelector('.feeds')
 
   return {
     form,
     inputForm,
     closeButtons,
+    errorContainer,
+    submitButton,
+    postsContainer,
+    modalElement,
+    feedsContainer,
   }
 }
 
-const { form, inputForm, closeButtons } = initDOM()
+const { 
+  form, 
+  inputForm, 
+  closeButtons, 
+  errorContainer, 
+  submitButton, 
+  postsContainer, 
+  modalElement, 
+  feedsContainer 
+} = initDOM()
+
 const validationSchema = initValidation(i18nInstance)
+
+const elements = {
+  errorContainer,
+  inputForm,
+  submitButton,
+  postsContainer,
+  modalElement,
+  feedsContainer,
+}
 
 const watchedState = initWatchedState(state, i18nInstance, {
   handlePostClick: (postId, isModalClick = false) => {
@@ -38,7 +69,7 @@ const watchedState = initWatchedState(state, i18nInstance, {
       }
     }
   },
-})
+}, elements)
 
 const handleClose = () => {
   watchedState.uiState.modal.isOpen = false

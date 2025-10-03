@@ -1,12 +1,16 @@
-const renderModal = (modalElement, modalState, posts) => {
+const renderModal = (modalElement, modalState, post) => {
   if (!modalElement) return
 
   const modalTitle = modalElement.querySelector('.modal-title')
   const modalBody = modalElement.querySelector('.modal-body')
   const fullArticleLink = modalElement.querySelector('.full-article')
 
-  const post = posts.find((p) => p.postId === modalState.postId)
-  if (!post) return
+  if (!post) {
+    modalTitle.textContent = ''
+    modalBody.textContent = ''
+    fullArticleLink.href = '#'
+    return
+  }
 
   modalTitle.textContent = post.title
   modalBody.textContent = post.description
@@ -20,8 +24,6 @@ const renderModal = (modalElement, modalState, posts) => {
     modalElement.classList.remove('show')
     modalElement.style.display = 'none'
     modalElement.setAttribute('aria-hidden', 'true')
-    modalTitle.textContent = ''
-    modalBody.textContent = ''
   }
 }
 

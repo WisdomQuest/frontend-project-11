@@ -11,6 +11,7 @@ export default {
       process: {
         success: 'RSS успешно загружен',
       },
+      headers: { feeds: 'Фиды' },
     },
   },
-}
+};

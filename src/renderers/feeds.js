@@ -1,6 +1,5 @@
-const renderFeeds = (feeds, containerSelector = '.feeds') => {
-  const feed = document.querySelector(containerSelector)
-  feed.innerHTML = ''
+const renderFeeds = (feeds, i18nInstance, feedsContainer) => {
+  feedsContainer.innerHTML = ''
 
   const card = document.createElement('div')
   card.className = 'card border-0'
@@ -10,7 +9,7 @@ const renderFeeds = (feeds, containerSelector = '.feeds') => {
 
   const cardTitle = document.createElement('h2')
   cardTitle.className = 'card-title h4'
-  cardTitle.textContent = 'Фиды'
+  cardTitle.textContent = i18nInstance.t('headers.feeds')
 
   cardBody.appendChild(cardTitle)
   card.appendChild(cardBody)
@@ -36,7 +35,7 @@ const renderFeeds = (feeds, containerSelector = '.feeds') => {
   })
 
   card.appendChild(listGroup)
-  feed.appendChild(card)
+  feedsContainer.appendChild(card)
 }
 
 export default renderFeeds
