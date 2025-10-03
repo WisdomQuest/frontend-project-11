@@ -10,13 +10,11 @@ const renderErrors = (errorContainer, inputElement, error, i18nInstance, status)
 
   switch (status) {
     case 'success':
-      inputElement.classList.remove('is-invalid')
       container.classList.add('text-success')
       messageElement.textContent = i18nInstance.t('process.success')
       break
 
     case 'failed':
-      inputElement.classList.remove('is-invalid')
       container.classList.add('text-danger')
       messageElement.textContent = error
       break
