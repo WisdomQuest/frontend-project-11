@@ -74,7 +74,9 @@ export default () => {
     feedsContainer: document.querySelector('.feeds'),
   })
 
-  const { form, inputForm, closeButtons, errorContainer, submitButton, postsContainer, modalElement, feedsContainer } = initDOM()
+  const {
+    form, inputForm, closeButtons, errorContainer, submitButton, postsContainer, modalElement, feedsContainer,
+  } = initDOM()
 
   const validationSchema = initValidation(i18nInstance)
 

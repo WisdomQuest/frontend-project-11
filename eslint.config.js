@@ -1,5 +1,4 @@
 import globals from 'globals'
-
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { FlatCompat } from '@eslint/eslintrc'
@@ -18,12 +17,12 @@ export default [
   {
     languageOptions: {
       globals: {
+        // Combine all required global variables here
         ...globals.node,
         ...globals.jest,
+        ...globals.browser, // Replaces `env: { browser: true }`
       },
       parserOptions: {
-        // Eslint doesn't supply ecmaVersion in `parser.js` `context.parserOptions`
-        // This is required to avoid ecmaVersion < 2015 error or 'import' / 'export' error
         ecmaVersion: 'latest',
         sourceType: 'module',
       },
@@ -32,9 +31,7 @@ export default [
     rules: {
       ...importPlugin.configs.recommended.rules,
     },
-    env: {
-      browser: true,
-    },
+    // REMOVED the invalid 'env' section
   },
   ...compat.extends('airbnb-base'),
   {
@@ -57,6 +54,5 @@ export default [
       'no-console': 'off',
       'import/no-extraneous-dependencies': 'off',
     },
-
   },
 ]

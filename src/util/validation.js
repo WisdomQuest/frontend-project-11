@@ -25,7 +25,6 @@ export default (i18nInstance) => {
           (value) => {
             if (!value) return true
             return !checkDuplicateUrl(value, feeds)
-            
           },
         )
 
