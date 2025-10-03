@@ -23,21 +23,21 @@ const renderPosts = (postsContainer, posts, viewedPosts, handleClick) => {
 
     const postLink = document.createElement('a')
     postLink.href = post.link
-    postLink.className = viewedPosts.has(post.id) ? 'fw-normal link-secondary' : 'fw-bold'
+    postLink.className = viewedPosts.has(post.postId) ? 'fw-normal link-secondary' : 'fw-bold'
     postLink.textContent = post.title
     postLink.setAttribute('target', '_blank')
     postLink.setAttribute('rel', 'noopener noreferrer')
-    postLink.dataset.id = post.id
-    postLink.addEventListener('click', () => handleClick(post.id, false))
+    postLink.dataset.postId = post.postId
+    postLink.addEventListener('click', () => handleClick(post.postId, false))
 
     const viewButton = document.createElement('button')
     viewButton.type = 'button'
     viewButton.className = 'btn btn-outline-primary btn-sm'
     viewButton.textContent = 'Просмотр'
-    viewButton.dataset.id = post.id
+    viewButton.dataset.postId = post.postId
     viewButton.dataset.bsToggle = 'modal'
     viewButton.dataset.bsTarget = '#modal'
-    viewButton.addEventListener('click', () => handleClick(post.id, true))
+    viewButton.addEventListener('click', () => handleClick(post.postId, true))
 
     listItem.appendChild(postLink)
     listItem.appendChild(viewButton)

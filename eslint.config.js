@@ -32,6 +32,9 @@ export default [
     rules: {
       ...importPlugin.configs.recommended.rules,
     },
+    env: {
+      browser: true,
+    },
   },
   ...compat.extends('airbnb-base'),
   {
@@ -54,8 +57,6 @@ export default [
       'no-console': 'off',
       'import/no-extraneous-dependencies': 'off',
     },
-    env: {
-      browser: true,
-    },
+
   },
 ]

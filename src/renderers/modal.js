@@ -5,7 +5,7 @@ const renderModal = (modalElement, modalState, posts) => {
   const modalBody = modalElement.querySelector('.modal-body')
   const fullArticleLink = modalElement.querySelector('.full-article')
 
-  const post = posts.find((p) => p.id === modalState.postId)
+  const post = posts.find((p) => p.postId === modalState.postId)
   if (!post) return
 
   modalTitle.textContent = post.title

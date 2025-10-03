@@ -68,11 +68,11 @@ const updateFeeds = async () => {
     const promises = watchedState.data.feeds.map(async (feed) => {
       try {
         const data = await fetchFeed(feed.url)
-        const { posts: newPosts } = parser(data, feed.url, i18nInstance, feed.id)
+        const { posts: newPosts } = parser(data, feed.url, i18nInstance, feed.feedId)
 
         const existingLinks = new Set(
           watchedState.data.posts
-            .filter((post) => post.idFeed === feed.id)
+            .filter((post) => post.feedId === feed.feedId)
             .map((post) => post.link),
         )
 

@@ -1,9 +1,6 @@
 import * as yup from 'yup'
 
-const checkDuplicateUrl = (url, feeds) => new Promise((resolve) => {
-  const isDuplicate = feeds.some((feed) => feed.url === url)
-  resolve(isDuplicate)
-})
+const checkDuplicateUrl = (url, feeds) => feeds.some((feed) => feed.url === url)
 
 export default (i18nInstance) => {
   yup.setLocale({
@@ -27,9 +24,8 @@ export default (i18nInstance) => {
           () => i18nInstance.t('error.duplicate_url'),
           (value) => {
             if (!value) return true
-            return checkDuplicateUrl(value, feeds).then(
-              (isDuplicate) => !isDuplicate,
-            )
+            return !checkDuplicateUrl(value, feeds)
+            
           },
         )
 
