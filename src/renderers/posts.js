@@ -1,5 +1,6 @@
 const renderPosts = (postsContainer, posts, viewedPosts, handleClick) => {
-  postsContainer.innerHTML = ''
+  const container = postsContainer
+  container.innerHTML = ''
 
   const card = document.createElement('div')
   card.className = 'card border-0'
@@ -45,7 +46,7 @@ const renderPosts = (postsContainer, posts, viewedPosts, handleClick) => {
   })
 
   card.appendChild(listGroup)
-  postsContainer.appendChild(card)
+  container.appendChild(card)
 }
 
 export default renderPosts

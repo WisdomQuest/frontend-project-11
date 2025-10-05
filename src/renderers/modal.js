@@ -18,10 +18,12 @@ const renderModal = (modalElement, modalState, post) => {
 
   if (modalState.isOpen) {
     modalElement.classList.add('show')
+    /* eslint-disable-next-line no-param-reassign */
     modalElement.style.display = 'block'
     modalElement.setAttribute('aria-modal', 'true')
   } else {
     modalElement.classList.remove('show')
+    /* eslint-disable-next-line no-param-reassign */
     modalElement.style.display = 'none'
     modalElement.setAttribute('aria-hidden', 'true')
   }

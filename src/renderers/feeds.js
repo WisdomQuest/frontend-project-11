@@ -1,5 +1,7 @@
 const renderFeeds = (feeds, i18nInstance, feedsContainer) => {
-  feedsContainer.innerHTML = ''
+  const container = feedsContainer
+
+  container.innerHTML = ''
 
   const card = document.createElement('div')
   card.className = 'card border-0'
@@ -35,7 +37,7 @@ const renderFeeds = (feeds, i18nInstance, feedsContainer) => {
   })
 
   card.appendChild(listGroup)
-  feedsContainer.appendChild(card)
+  container.appendChild(card)
 }
 
 export default renderFeeds

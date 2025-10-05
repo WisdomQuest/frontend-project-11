@@ -37,6 +37,7 @@ const createUpdateFeeds = (watchedState, i18nInstance) => async () => {
         )
 
         if (uniqueNewPosts.length > 0) {
+          /* eslint-disable-next-line no-param-reassign */
           watchedState.data.posts = [...uniqueNewPosts, ...watchedState.data.posts]
         }
       } catch (err) {
@@ -75,7 +76,14 @@ export default () => {
   })
 
   const {
-    form, inputForm, closeButtons, errorContainer, submitButton, postsContainer, modalElement, feedsContainer,
+    form,
+    inputForm,
+    closeButtons,
+    errorContainer,
+    submitButton,
+    postsContainer,
+    modalElement,
+    feedsContainer,
   } = initDOM()
 
   const validationSchema = initValidation(i18nInstance)
