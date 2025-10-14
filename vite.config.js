@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url'
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 
 export default {
-  root: resolve(__dirname, 'src'),
+  root: resolve(__dirname),
   build: {
     outDir: '../dist',
   },
