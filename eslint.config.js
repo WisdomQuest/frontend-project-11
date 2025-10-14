@@ -15,7 +15,7 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ["eslint.config.js"],
+    ignores: ['eslint.config.js'],
   },
   {
     languageOptions: {
