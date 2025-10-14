@@ -46,7 +46,7 @@ const initWatchedState = (state, i18nInstance, handlers, elements) => {
     }
 
     if (path.startsWith('uiState.modal')) {
-      const post = state.data.posts.find((p) => p.postId === state.uiState.modal.postId)
+      const post = state.data.posts.find(p => p.postId === state.uiState.modal.postId)
       renderModal(modalElement, state.uiState.modal, post)
     }
 

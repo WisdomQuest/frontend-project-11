@@ -28,25 +28,26 @@ const createUpdateFeeds = (watchedState, i18nInstance) => async () => {
 
         const existingLinks = new Set(
           watchedState.data.posts
-            .filter((post) => post.feedId === feed.feedId)
-            .map((post) => post.link),
+            .filter(post => post.feedId === feed.feedId)
+            .map(post => post.link),
         )
 
         const uniqueNewPosts = newPosts.filter(
-          (post) => !existingLinks.has(post.link),
+          post => !existingLinks.has(post.link),
         )
 
         if (uniqueNewPosts.length > 0) {
-          /* eslint-disable-next-line no-param-reassign */
           watchedState.data.posts = [...uniqueNewPosts, ...watchedState.data.posts]
         }
-      } catch (err) {
+      }
+      catch (err) {
         console.error(`Ошибка обновления фида ${feed.url}:`, err)
       }
     })
 
     await Promise.all(promises)
-  } finally {
+  }
+  finally {
     setTimeout(createUpdateFeeds(watchedState, i18nInstance), 5000)
   }
 }
@@ -143,7 +144,8 @@ export default () => {
       watchedState.process.error = null
       inputForm.value = ''
       inputForm.focus()
-    } catch (err) {
+    }
+    catch (err) {
       watchedState.process.status = 'failed'
       watchedState.process.error = err.message === i18nInstance.t('error.no_rss')
         ? i18nInstance.t('error.no_rss')

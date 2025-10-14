@@ -19,7 +19,7 @@ export default function Parser(data, url, i18nInstance, feedId = uuidv4()) {
 
   const items = xmlDoc.querySelectorAll('item')
 
-  const posts = Array.from(items).map((item) => ({
+  const posts = Array.from(items).map(item => ({
     title: getTextContent(item, 'title'),
     description: getTextContent(item, 'description'),
     link: getTextContent(item, 'link'),
