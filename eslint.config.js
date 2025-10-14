@@ -37,6 +37,9 @@ export default [
   {
     rules: {
       'semi': ['error', 'never'],
+      'brace-style': ['error', 'stroustrup'],
+      'arrow-parens': ['off'],
+      'no-param-reassign': ['off'],
       'no-underscore-dangle': [
         'error',
         {
