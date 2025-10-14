@@ -36,6 +36,8 @@ export default [
   ...compat.extends('airbnb-base'),
   {
     rules: {
+      'quote-props': ['error', 'as-needed'],
+      'semi': ['error', 'never'],
       'brace-style': ['error', 'stroustrup'],
       'arrow-parens': ['off'],
       'no-param-reassign': ['off'],
